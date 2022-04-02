@@ -1,5 +1,11 @@
 package main
 
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+)
+
 type Block struct {
 	Pos       int
 	Data      BookCheckout
@@ -21,4 +27,12 @@ type Book struct {
 	Author          string `json:"author"`
 	PublishableDate string `json:"publish_date"`
 	ISBN            string `json:"isbn"`
+}
+
+func (b *Block) generateHash() {
+	bytes, _ := json.Marshal(b.Data)
+	data := string(b.Pos) + b.Timestamp + string(bytes) + b.PrevHash
+	hash := sha256.New()
+	hash.Write([]byte(data))
+	b.Hash = hex.EncodeToString(hash.Sum(nil))
 }
