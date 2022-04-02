@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"time"
 )
 
 type Block struct {
@@ -35,4 +36,15 @@ func (b *Block) generateHash() {
 	hash := sha256.New()
 	hash.Write([]byte(data))
 	b.Hash = hex.EncodeToString(hash.Sum(nil))
+}
+
+func CreateBlock(prevBlock *Block, checkoutItem BookCheckout) *Block {
+	block := &Block{}
+	block.Pos = prevBlock.Pos + 1
+	block.Timestamp = time.Now().String()
+	block.Data = checkoutItem
+	block.PrevHash = prevBlock.Hash
+	block.generateHash()
+
+	return block
 }
