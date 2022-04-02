@@ -48,3 +48,52 @@ func CreateBlock(prevBlock *Block, checkoutItem BookCheckout) *Block {
 
 	return block
 }
+
+type Blockchain struct {
+	blocks []*Block
+}
+
+var BlockChain *Blockchain
+
+func (bc *Blockchain) AddBlock(data BookCheckout) {
+
+	prevBlock := bc.blocks[len(bc.blocks)-1]
+
+	block := CreateBlock(prevBlock, data)
+
+	if validBlock(block, prevBlock) {
+		bc.blocks = append(bc.blocks, block)
+	}
+}
+
+func Genesisblock() *Block {
+	return CreateBlock(&Block{}, BookCheckout{IsGenesis: true})
+}
+
+func NewBlockchain() *Blockchain {
+	return &Blockchain{[]*Block{Genesisblock()}}
+}
+
+func validBlock(block, prevBlock *Block) bool {
+
+	if prevBlock.Hash != block.PrevHash {
+		return false
+	}
+
+	if !block.validateHash(block.Hash) {
+		return false
+	}
+
+	if prevBlock.Pos+1 != block.Pos {
+		return false
+	}
+	return true
+}
+
+func (b *Block) validateHash(hash string) bool {
+	b.generateHash()
+	if b.Hash != hash {
+		return false
+	}
+	return true
+}
